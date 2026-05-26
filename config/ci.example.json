@@ -1,0 +1,18 @@
+{
+  "description": "Пример конфигурации CI/CD для запуска сценарных тестов 1С. Скопируйте в ci.local.json или задайте значения через переменные окружения.",
+  "vanessaRunnerPath": "C:\\tools\\vanessa-runner\\vanessa-runner.exe",
+  "vanessaAutomationPath": "C:\\tools\\vanessa-automation\\vanessa-automation.epf",
+  "connectionString": "/F C:\\1c_bases\\vkr_test",
+  "user": "Tester",
+  "password": "",
+  "testBaseBackup": "C:\\1c_backups\\vkr_etalon.dt",
+  "resultDir": "artifacts\\ci",
+  "defaultTagExpression": "@smoke and not @unstable",
+  "featureRoot": "features",
+  "reportFormats": [
+    "junit",
+    "html",
+    "log"
+  ],
+  "artifactRetentionDays": 14
+}

@@ -1,0 +1,19 @@
+name: Repository smoke check
+
+on:
+  pull_request:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  structure-check:
+    name: Check repository structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate structure
+        shell: bash
+        run: bash scripts/check-repository.sh

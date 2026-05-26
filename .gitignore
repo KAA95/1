@@ -1,0 +1,35 @@
+# 1C temporary files
+*.tmp
+*.log
+*.dt
+*.cf
+*.cfu
+*.epf
+*.erf
+*.1CD
+*.lgp
+*.lgf
+
+# Vanessa / test results
+artifacts/**
+reports/**
+logs/**
+screenshots/**
+*.junit.xml
+*.trx
+*.html
+
+# Keep directory placeholders
+!artifacts/.gitkeep
+!reports/.gitkeep
+
+# Local config and secrets
+.env
+config/ci.local.json
+config/*.secret.json
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/

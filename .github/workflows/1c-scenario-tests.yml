@@ -1,0 +1,81 @@
+name: 1C scenario tests
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 20 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      tag_expression:
+        description: 'Tag expression for Vanessa Automation scenarios'
+        required: false
+        default: '@smoke and not @unstable'
+      restore_base:
+        description: 'Restore test base before run'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  scenario-tests:
+    name: Run Vanessa Automation scenarios
+    runs-on: [self-hosted, windows, 1c]
+    timeout-minutes: 90
+
+    env:
+      RESULT_DIR: artifacts\ci-${{ github.run_number }}
+      TAG_EXPRESSION: ${{ github.event.inputs.tag_expression || '@smoke and not @unstable' }}
+      SETTINGS_PATH: config\ci.example.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show run context
+        shell: powershell
+        run: |
+          Write-Host "Branch: $env:GITHUB_REF_NAME"
+          Write-Host "Commit: $env:GITHUB_SHA"
+          Write-Host "Tags: $env:TAG_EXPRESSION"
+          Write-Host "Result dir: $env:RESULT_DIR"
+
+      - name: Restore test base
+        if: ${{ github.event.inputs.restore_base != 'false' }}
+        shell: powershell
+        run: |
+          .\scripts\restore-test-base.ps1 -SettingsPath "$env:SETTINGS_PATH"
+
+      - name: Run scenario tests
+        shell: powershell
+        run: |
+          .\scripts\run-vanessa-tests.ps1 `
+            -TagExpression "$env:TAG_EXPRESSION" `
+            -ResultDir "$env:RESULT_DIR" `
+            -SettingsPath "$env:SETTINGS_PATH"
+
+      - name: Collect artifacts
+        if: always()
+        shell: powershell
+        run: |
+          .\scripts\collect-artifacts.ps1 `
+            -ResultDir "$env:RESULT_DIR" `
+            -SettingsPath "$env:SETTINGS_PATH"
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1c-scenario-test-artifacts-${{ github.run_number }}
+          path: |
+            artifacts/**
+            reports/**
+            logs/**
+            screenshots/**
+          if-no-files-found: warn
+          retention-days: 14
